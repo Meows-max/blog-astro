@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts, getPostUrl } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  const tagMap = new Map<string, any[]>();
+  for (const post of posts) {
+    for (const tag of post.data.tags) {
+      if (!tagMap.has(tag)) tagMap.set(tag, []);
+      tagMap.get(tag)!.push(post);
+    }
+  }
+  return Array.from(tagMap.entries()).map(([tag, tagPosts]) => ({
+    params: { tag },
+    props: { tag, posts: tagPosts },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`标签: ${tag}`}>
+  <h1 style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>#{tag}</h1>
+
+  <ul class="post-list">
+    {posts.map((post) => (
+      <li>
+        <a href={getPostUrl(post)}>
+          <span class="post-title" style={{ fontSize: '1.0625rem' }}>{post.data.title}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

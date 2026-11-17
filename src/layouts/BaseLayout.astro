@@ -1,0 +1,96 @@
+---
+import { SITE_TITLE, SITE_DESCRIPTION, NAV } from '../consts';
+import { withBase } from '../lib/url';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
+const pageDesc = description ?? SITE_DESCRIPTION;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDesc} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDesc} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content={SITE_TITLE} />
+
+    <!-- 暗色模式首屏防闪：在 CSS 加载前同步读取偏好 -->
+    <script>
+      (function () {
+        try {
+          const saved = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (!saved && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href={withBase('/')}>{SITE_TITLE}</a>
+        <nav>
+          <ul class="nav-links">
+            {
+              NAV.map((item) => (
+                <li><a href={withBase(item.href)}>{item.label}</a></li>
+              ))
+            }
+            <li>
+              <button
+                class="theme-toggle"
+                id="theme-toggle"
+                aria-label="切换主题"
+              >
+                🌓
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <slot />
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© {new Date().getFullYear()} {SITE_TITLE} · Built with Astro</p>
+      </div>
+    </footer>
+
+    <script>
+      // 主题切换逻辑
+      const toggle = document.getElementById('theme-toggle');
+      toggle?.addEventListener('click', () => {
+        const root = document.documentElement;
+        const current = root.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+      });
+    </script>
+  </body>
+</html>

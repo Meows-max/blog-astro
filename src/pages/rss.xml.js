@@ -1,0 +1,19 @@
+import rss from '@astrojs/rss';
+import { getPublishedPosts, getPostUrl } from '../lib/posts';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+export async function GET(context) {
+  const posts = await getPublishedPosts();
+  return rss({
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    site: context.site ?? 'https://featon0526.github.io/blog-astro/',
+    items: posts.map((post) => ({
+      title: post.data.title,
+      pubDate: post.data.date,
+      description: post.data.description ?? post.data.title,
+      link: getPostUrl(post),
+    })),
+    customData: `<language>zh-CN</language>`,
+  });
+}

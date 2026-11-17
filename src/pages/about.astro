@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+// 如果 content/pages/about.md 存在则渲染，否则显示默认
+const pages = await getCollection('pages').catch(() => []);
+const aboutPage = pages.find((p) => p.id === 'about');
+let Content = null;
+if (aboutPage) {
+  const rendered = await render(aboutPage);
+  Content = rendered.Content;
+}
+---
+
+<BaseLayout title="关于">
+  <h1 style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>关于</h1>
+
+  {Content ? (
+    <div class="post-content">
+      <Content />
+    </div>
+  ) : (
+    <div class="post-content">
+      <p>你好，这里是我的个人博客。</p>
+      <p>可以在 <code>src/content/pages/about.md</code> 写更多自我介绍。</p>
+    </div>
+  )}
+</BaseLayout>

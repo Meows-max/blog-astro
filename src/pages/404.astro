@@ -1,0 +1,26 @@
+---
+import { withBase } from '../lib/url';
+
+// 404 页面，返回首页或显示提示
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>404 · 页面不存在</title>
+    <meta http-equiv="refresh" content="5; url={withBase('/')}" />
+  </head>
+  <body style={{
+    fontFamily: 'system-ui, sans-serif',
+    textAlign: 'center',
+    padding: '4rem 2rem',
+    backgroundColor: '#0d1117',
+    color: '#e6edf3'
+  }}>
+    <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>404</h1>
+    <p>页面不存在，5 秒后返回首页...</p>
+    <p><a href={withBase('/')} style={{ color: '#58a6ff' }}>手动返回首页</a></p>
+  </body>
+</html>
